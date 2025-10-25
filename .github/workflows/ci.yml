@@ -1,0 +1,107 @@
+# Bazel CI Test Workflow
+#
+# This workflow tests the artagon-workflows Bazel CI reusable workflow.
+# It validates that the workflow behaves correctly with various configurations.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run daily at 2 AM UTC to catch any breaking changes in artagon-workflows
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      bazel-version:
+        description: 'Bazel version to test'
+        required: false
+        default: 'latest'
+      config:
+        description: 'Bazel config to use'
+        required: false
+        default: ''
+  repository_dispatch:
+    types: [workflow-updated, release-published]
+
+jobs:
+  # Test with default configuration
+  test-default:
+    name: Test Default Configuration
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    secrets: inherit
+
+  # Test with latest Bazel version
+  test-latest:
+    name: Test Latest Bazel
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    with:
+      bazel-version: 'latest'
+      run-tests: true
+    secrets: inherit
+
+  # Test with specific Bazel version
+  test-version-7:
+    name: Test Bazel 7.x
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    with:
+      bazel-version: '7.x'
+      run-tests: true
+    secrets: inherit
+
+  # Test with custom configs
+  test-custom-configs:
+    name: Test Custom Configs
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    with:
+      bazel-version: 'latest'
+      bazel-configs: 'release debug'
+      run-tests: true
+    secrets: inherit
+
+  # Test with custom targets
+  test-custom-targets:
+    name: Test Custom Targets
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    with:
+      bazel-version: 'latest'
+      build-targets: '//src:hello //src:hello_test'
+      test-targets: '//src:hello_test'
+      run-tests: true
+    secrets: inherit
+
+  # Test without running tests
+  test-skip-tests:
+    name: Test Skip Tests
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    with:
+      bazel-version: 'latest'
+      run-tests: false
+    secrets: inherit
+
+  # Summary job to check all tests passed
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [test-default, test-latest, test-version-7, test-custom-configs, test-custom-targets, test-skip-tests]
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          FAILED=false
+          for job in test-default test-latest test-version-7 test-custom-configs test-custom-targets test-skip-tests; do
+            result=$(echo '${{ toJSON(needs) }}' | jq -r ".[\"$job\"].result")
+            if [ "$result" != "success" ]; then
+              echo "❌ $job failed with result: $result"
+              FAILED=true
+            fi
+          done
+
+          if [ "$FAILED" = "true" ]; then
+            echo "❌ One or more tests failed"
+            exit 1
+          else
+            echo "✅ All tests passed"
+          fi
