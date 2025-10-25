@@ -30,13 +30,13 @@ jobs:
   # Test with default configuration
   test-default:
     name: Test Default Configuration
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     secrets: inherit
 
   # Test with latest Bazel version
   test-latest:
     name: Test Latest Bazel
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
       run-tests: true
@@ -45,7 +45,7 @@ jobs:
   # Test with specific Bazel version
   test-version-7:
     name: Test Bazel 7.x
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: '7.x'
       run-tests: true
@@ -54,7 +54,7 @@ jobs:
   # Test with custom configs
   test-custom-configs:
     name: Test Custom Configs
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
       bazel-configs: 'release debug'
@@ -64,7 +64,7 @@ jobs:
   # Test with custom targets
   test-custom-targets:
     name: Test Custom Targets
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
       build-targets: '//src:hello //src:hello_test'
@@ -75,7 +75,7 @@ jobs:
   # Test without running tests
   test-skip-tests:
     name: Test Skip Tests
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
       run-tests: false
