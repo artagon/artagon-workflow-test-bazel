@@ -39,7 +39,6 @@ jobs:
     uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
-      run-tests: true
     secrets: inherit
 
   # Test with specific Bazel version
@@ -48,7 +47,6 @@ jobs:
     uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: '7.x'
-      run-tests: true
     secrets: inherit
 
   # Test with custom configs
@@ -57,8 +55,7 @@ jobs:
     uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
-      bazel-configs: 'release debug'
-      run-tests: true
+      bazel-configs: 'release,debug'
     secrets: inherit
 
   # Test with custom targets
@@ -67,31 +64,29 @@ jobs:
     uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
-      build-targets: '//src:hello //src:hello_test'
-      test-targets: '//src:hello_test'
-      run-tests: true
+      targets: '//src:hello //src:hello_test'
     secrets: inherit
 
-  # Test without running tests
-  test-skip-tests:
-    name: Test Skip Tests
+  # Test without coverage
+  test-no-coverage:
+    name: Test Without Coverage
     uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
     with:
       bazel-version: 'latest'
-      run-tests: false
+      enable-coverage: false
     secrets: inherit
 
   # Summary job to check all tests passed
   test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [test-default, test-latest, test-version-7, test-custom-configs, test-custom-targets, test-skip-tests]
+    needs: [test-default, test-latest, test-version-7, test-custom-configs, test-custom-targets, test-no-coverage]
     if: always()
     steps:
       - name: Check test results
         run: |
           FAILED=false
-          for job in test-default test-latest test-version-7 test-custom-configs test-custom-targets test-skip-tests; do
+          for job in test-default test-latest test-version-7 test-custom-configs test-custom-targets test-no-coverage; do
             result=$(echo '${{ toJSON(needs) }}' | jq -r ".[\"$job\"].result")
             if [ "$result" != "success" ]; then
               echo "❌ $job failed with result: $result"
