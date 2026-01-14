@@ -30,13 +30,13 @@ jobs:
   # Test with default configuration
   test-default:
     name: Test Default Configuration
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
     secrets: inherit
 
   # Test with latest Bazel version
   test-latest:
     name: Test Latest Bazel
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
     with:
       bazel-version: 'latest'
     secrets: inherit
@@ -44,7 +44,7 @@ jobs:
   # Test with specific Bazel version
   test-version-7:
     name: Test Bazel 7.x
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
     with:
       bazel-version: '7.x'
     secrets: inherit
@@ -52,7 +52,7 @@ jobs:
   # Test with custom configs
   test-custom-configs:
     name: Test Custom Configs
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
     with:
       bazel-version: 'latest'
       bazel-configs: 'release,debug'
@@ -61,7 +61,7 @@ jobs:
   # Test with custom targets
   test-custom-targets:
     name: Test Custom Targets
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
     with:
       bazel-version: 'latest'
       targets: '//src:hello //src:hello_test'
@@ -70,7 +70,7 @@ jobs:
   # Test without coverage
   test-no-coverage:
     name: Test Without Coverage
-    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@feature/update-cache-and-sync-ci
+    uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
     with:
       bazel-version: 'latest'
       enable-coverage: false
