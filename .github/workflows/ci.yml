@@ -58,13 +58,13 @@ jobs:
       bazel-configs: 'release,debug'
     secrets: inherit
 
-  # Test with custom targets
+  # Test with custom targets (using correct root-level targets)
   test-custom-targets:
     name: Test Custom Targets
     uses: artagon/artagon-workflows/.github/workflows/bazel_multi_ci.yml@main
     with:
       bazel-version: 'latest'
-      targets: '//src:hello //src:hello_test'
+      targets: '//:hello //:greeter_test'
     secrets: inherit
 
   # Test without coverage
