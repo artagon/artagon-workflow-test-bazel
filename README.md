@@ -1,98 +1,81 @@
-# Artagon Workflows - Bazel CI Test Repository
+# Artagon Workflow Test - Bazel
 
-This repository tests the [artagon-workflows](https://github.com/artagon/artagon-workflows) Bazel CI reusable workflow.
+[![CI](https://github.com/artagon/artagon-workflow-test-bazel/actions/workflows/ci.yml/badge.svg)](https://github.com/artagon/artagon-workflow-test-bazel/actions/workflows/ci.yml)
+
+Test repository for validating [artagon-workflows](https://github.com/artagon/artagon-workflows) Bazel CI reusable workflow.
 
 ## Purpose
 
-Validates that the `bazel_multi_ci.yml` reusable workflow:
+Validates that `bazel_multi_ci.yml` reusable workflow:
 - Builds Bazel projects correctly
 - Runs tests and reports results
-- Supports different Bazel versions
+- Supports different Bazel versions (latest, 7.x)
 - Handles multiple configurations (release, debug)
-- Works with custom build and test targets
-- Uploads build artifacts
-- Works with various configurations
-
-## Test Matrix
-
-| Test | Bazel Version | Configs | Custom Targets | Tests |
-|------|---------------|---------|----------------|-------|
-| Default | latest | - | - | ✓ |
-| Latest | latest | - | - | ✓ |
-| Version 7 | 7.x | - | - | ✓ |
-| Custom Configs | latest | release, debug | - | ✓ |
-| Custom Targets | latest | - | //src:hello //src:hello_test | ✓ |
-| Skip Tests | latest | - | - | ✗ |
-
-## Triggers
-
-This workflow runs on:
-- **Push to main** - Validates changes to this test repo
-- **Pull requests** - Validates PRs before merge
-- **Daily schedule** (2 AM UTC) - Catches breaking changes in artagon-workflows
-- **Manual dispatch** - On-demand testing with custom Bazel version/config
-- **Repository dispatch** - Triggered by artagon-workflows on releases/updates
+- Works with custom build targets
+- Generates code coverage
 
 ## Project Structure
 
 ```
 .
-├── WORKSPACE               # Bazel workspace configuration
-├── BUILD.bazel            # Bazel build configuration
+├── .bazelrc              # Bazel configuration (release, debug, coverage)
+├── BUILD.bazel           # Root BUILD file with all targets
+├── WORKSPACE             # Workspace marker
 ├── src/
-│   ├── BUILD.bazel        # Source-level build config
-│   ├── hello.h            # Header file
-│   ├── hello.cpp          # Implementation
-│   ├── main.cpp           # Main program
-│   └── hello_test.cpp     # Test file
-└── .github/
-    └── workflows/
-        └── ci.yml         # Workflow testing configuration
+│   ├── greeter.h         # Library header
+│   ├── greeter.cc        # Library implementation
+│   ├── main.cc           # Main program
+│   └── greeter_test.cc   # Unit test
+└── .github/workflows/
+    └── ci.yml            # CI configuration
 ```
 
-## Test Project
+## Targets
 
-This is a minimal Bazel project with:
-- **Language**: C++
-- **Build System**: Bazel
-- **Targets**:
-  - `//src:hello` - Library target
-  - `//src:hello_main` - Binary target
-  - `//src:hello_test` - Test target
+| Target | Type | Description |
+|--------|------|-------------|
+| `//:greeter` | `cc_library` | Greeter library |
+| `//:hello` | `cc_binary` | Main executable |
+| `//:greeter_test` | `cc_test` | Unit tests |
+
+## Test Matrix
+
+| Test | Bazel Version | Configs | Custom Targets |
+|------|---------------|---------|----------------|
+| Default | latest | release, debug | `//...` |
+| Latest | latest | release, debug | `//...` |
+| Version 7 | 7.x | release, debug | `//...` |
+| Custom Configs | latest | release, debug | `//...` |
+| Custom Targets | latest | release, debug | `//:hello //:greeter_test` |
+| No Coverage | latest | release, debug | `//...` |
+
+## Triggers
+
+- **Push to main** - Validates changes
+- **Pull requests** - Pre-merge validation
+- **Daily schedule** (2 AM UTC) - Catch upstream breaking changes
+- **Manual dispatch** - On-demand testing
+- **Repository dispatch** - Triggered by [trigger_test_repos.yml](https://github.com/artagon/artagon-workflows/blob/main/.github/workflows/trigger_test_repos.yml)
 
 ## Running Locally
 
 ```bash
-# Build all targets
+# Build all
 bazel build //...
 
-# Build specific target
-bazel build //src:hello_main
-
-# Run all tests
+# Test all
 bazel test //...
 
-# Run specific test
-bazel test //src:hello_test
-
-# Clean
-bazel clean
-```
-
-## Bazel Configurations
-
-This project supports multiple configurations that can be specified with `--config`:
-
-```bash
-# Build with release config
+# Build with config
 bazel build --config=release //...
-
-# Build with debug config
 bazel build --config=debug //...
+
+# Coverage
+bazel coverage --config=coverage //...
 ```
 
 ## Related
 
 - [artagon-workflows](https://github.com/artagon/artagon-workflows) - Main workflow repository
-- [Bazel Multi CI Workflow](https://github.com/artagon/artagon-workflows/blob/main/.github/workflows/bazel_multi_ci.yml) - The workflow being tested
-- [Testing Strategy](https://github.com/artagon/artagon-workflows/blob/main/.model-context/TESTING_STRATEGY.md) - Overall testing approach
+- [bazel_multi_ci.yml](https://github.com/artagon/artagon-workflows/blob/main/.github/workflows/bazel_multi_ci.yml) - Workflow being tested
+- [Testing Guide](https://github.com/artagon/artagon-workflows/blob/main/docs/TESTING.md)
